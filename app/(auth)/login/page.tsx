@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tractor, Eye, EyeOff, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { Tractor, Eye, EyeOff, ArrowRight, Loader2, ShieldCheck, X } from "lucide-react";
 import { useAuth, ADMIN_EMAIL } from "@/context/auth-context";
 
 const loginSchema = z.object({
@@ -20,9 +20,11 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [showGoogleModal, setShowGoogleModal] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const {
     register,
@@ -48,6 +50,23 @@ export default function LoginPage() {
       }
     } catch (err: any) {
       setServerError(err?.message || "An unexpected error occurred.");
+    }
+  }
+
+  async function handleGoogleSignIn(selectedEmail: string) {
+    setIsGoogleLoading(true);
+    try {
+      const res = await loginWithGoogle(selectedEmail);
+      setShowGoogleModal(false);
+      if (selectedEmail.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch {
+      setServerError("Google authentication failed.");
+    } finally {
+      setIsGoogleLoading(false);
     }
   }
 
@@ -112,27 +131,69 @@ export default function LoginPage() {
 
       {/* Right panel — form */}
       <div className="flex flex-1 items-center justify-center p-6 lg:p-12 bg-gray-50 dark:bg-gray-950">
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-7">
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-4">
+          <div className="lg:hidden flex items-center gap-2 mb-2">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-green-600">
               <Tractor className="h-5 w-5 text-white" />
             </div>
             <span className="text-xl font-bold text-emerald-600">KisanRent</span>
           </div>
 
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Sign in
+          <div className="space-y-1.5">
+            <h1 className="text-3xl font-black text-gray-900 dark:text-white font-heading tracking-tight">
+              Sign in to KisanRent
             </h1>
-            <p className="text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Enter your credentials to access your account
             </p>
           </div>
 
+          {/* ================= GOOGLE SIGN IN BUTTON ================= */}
+          <div className="space-y-4">
+            <button
+              type="button"
+              id="google-login-btn"
+              onClick={() => setShowGoogleModal(true)}
+              disabled={isGoogleLoading}
+              className="w-full flex items-center justify-center gap-3 h-12 px-4 rounded-xl border border-stone-300 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-800 dark:text-stone-100 hover:bg-stone-50 dark:hover:bg-stone-800 hover:border-stone-400 font-bold text-sm shadow-sm transition-all duration-200 cursor-pointer active:scale-[0.99]"
+            >
+              {/* Official Google G Logo SVG */}
+              <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              <span>{isGoogleLoading ? "Connecting to Google…" : "Log in with Google"}</span>
+            </button>
+
+            {/* Divider */}
+            <div className="relative flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-stone-200 dark:border-stone-800" />
+              </div>
+              <span className="relative bg-gray-50 dark:bg-gray-950 px-3 text-xs font-semibold uppercase tracking-wider text-stone-400">
+                Or continue with email
+              </span>
+            </div>
+          </div>
+
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-5"
+            className="space-y-4"
             id="login-form"
           >
             {serverError && (
@@ -187,11 +248,11 @@ export default function LoginPage() {
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" className="rounded border-gray-300 text-emerald-600" />
-                <span className="text-gray-600 dark:text-gray-400">Remember me</span>
+                <span className="text-gray-600 dark:text-gray-400 text-xs">Remember me</span>
               </label>
               <Link
                 href="/forgot-password"
-                className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 font-medium"
+                className="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 text-xs font-semibold"
               >
                 Forgot password?
               </Link>
@@ -199,7 +260,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-11 font-bold"
               size="lg"
               disabled={isSubmitting}
               id="login-submit"
@@ -209,17 +270,17 @@ export default function LoginPage() {
               ) : (
                 <ArrowRight className="h-4 w-4" />
               )}
-              {isSubmitting ? "Signing in…" : "Sign in"}
+              {isSubmitting ? "Signing in…" : "Sign in with Email"}
             </Button>
 
             {/* Quick Admin Access Button */}
-            <div className="relative my-4 pt-2">
+            <div className="relative pt-2">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-gray-200 dark:border-gray-800" />
               </div>
               <div className="relative flex justify-center text-[10px] uppercase">
                 <span className="bg-gray-50 dark:bg-gray-950 px-2 text-gray-400 font-bold tracking-wider">
-                  Admin Sign In
+                  Admin One-Click
                 </span>
               </div>
             </div>
@@ -247,6 +308,111 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
+
+      {/* ================= GOOGLE ACCOUNT CHOOSER MODAL ================= */}
+      {showGoogleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
+          <div className="w-full max-w-sm rounded-3xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 p-6 shadow-2xl space-y-5 animate-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-stone-800">
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5" viewBox="0 0 24 24">
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                  />
+                </svg>
+                <span className="text-sm font-bold text-stone-800 dark:text-stone-200">
+                  Choose a Google account
+                </span>
+              </div>
+              <button
+                onClick={() => setShowGoogleModal(false)}
+                className="text-stone-400 hover:text-stone-600 dark:hover:text-stone-200"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-stone-500">
+              to continue to <strong className="text-emerald-700 dark:text-emerald-400">KisanRent</strong>
+            </p>
+
+            <div className="space-y-2">
+              {/* Account 1: Master Admin chowdaryu24@gmail.com */}
+              <button
+                type="button"
+                onClick={() => handleGoogleSignIn(ADMIN_EMAIL)}
+                className="w-full flex items-center justify-between p-3 rounded-2xl border border-amber-300 bg-amber-50/60 dark:bg-amber-950/30 hover:bg-amber-100/80 dark:hover:bg-amber-900/50 transition-colors text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-amber-500 text-white font-black flex items-center justify-center text-sm shadow-sm">
+                    U
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-stone-900 dark:text-stone-100 flex items-center gap-1.5">
+                      <span>Umesh Chowdary</span>
+                      <span className="text-[9px] bg-amber-500 text-white px-1.5 py-0.2 rounded font-black">
+                        ADMIN
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-stone-500 font-mono">
+                      {ADMIN_EMAIL}
+                    </div>
+                  </div>
+                </div>
+                <ArrowRight className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+              </button>
+
+              {/* Account 2: Demo Farmer Account */}
+              <button
+                type="button"
+                onClick={() => handleGoogleSignIn("farmer.patil@gmail.com")}
+                className="w-full flex items-center justify-between p-3 rounded-2xl border border-stone-200 dark:border-stone-800 hover:bg-stone-50 dark:hover:bg-stone-800/60 transition-colors text-left cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-full bg-emerald-600 text-white font-black flex items-center justify-center text-sm shadow-sm">
+                    F
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-stone-900 dark:text-stone-100">
+                      Farmer Patil
+                    </div>
+                    <div className="text-[11px] text-stone-500 font-mono">
+                      farmer.patil@gmail.com
+                    </div>
+                  </div>
+                </div>
+                <ArrowRight className="h-4 w-4 text-stone-400" />
+              </button>
+            </div>
+
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  const input = prompt("Enter your Google email address:");
+                  if (input) handleGoogleSignIn(input);
+                }}
+                className="text-xs font-bold text-[#166534] dark:text-emerald-400 hover:underline cursor-pointer"
+              >
+                + Use another Google account
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

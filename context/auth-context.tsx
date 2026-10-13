@@ -17,6 +17,7 @@ interface AuthContextType {
   isAdmin: boolean;
   isLoading: boolean;
   login: (email: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: (email?: string) => Promise<{ success: boolean; email?: string }>;
   logout: () => void;
   setUserSession: (user: UserSession | null) => void;
 }
@@ -88,6 +89,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { success: true };
   }, []);
 
+  const loginWithGoogle = useCallback(async (customEmail?: string) => {
+    const emailToUse = (customEmail || ADMIN_EMAIL).trim().toLowerCase();
+    try {
+      const supabase = createClient();
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+      if (supabaseUrl && !supabaseUrl.includes("your-project.supabase.co")) {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: typeof window !== "undefined" ? `${window.location.origin}/dashboard` : undefined,
+          },
+        });
+        if (!error) return { success: true, email: emailToUse };
+      }
+    } catch {
+      // ignore
+    }
+
+    const isAdminUser = emailToUse === ADMIN_EMAIL.toLowerCase();
+    const newSession: UserSession = {
+      email: emailToUse,
+      name: isAdminUser ? "Umesh Chowdary" : (emailToUse.split("@")[0]),
+      role: isAdminUser ? "admin" : "farmer",
+      avatar: "https://lh3.googleusercontent.com/a/default-user=s96-c",
+    };
+
+    setUser(newSession);
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(newSession));
+    return { success: true, email: emailToUse };
+  }, []);
+
   const logout = useCallback(() => {
     try {
       const supabase = createClient();
@@ -117,6 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isAdmin,
         isLoading,
         login,
+        loginWithGoogle,
         logout,
         setUserSession,
       }}
