@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { EquipmentCard, type EquipmentItem } from "@/components/ui/equipment-card";
+import { useLanguage } from "@/context/language-context";
 import {
   Tractor,
   Search,
@@ -27,23 +28,10 @@ import {
   Star,
   ChevronDown,
   ArrowRight,
-  IndianRupee,
   Sparkles,
   PhoneCall,
-  ShieldAlert,
   Percent,
 } from "lucide-react";
-
-const categories = [
-  { name: "Tractor", icon: Tractor, count: "480+ available", desc: "40-75 HP utility & 4WD tractors", href: "/equipment?category=tractor" },
-  { name: "Harvester", icon: Wheat, count: "160+ available", desc: "Multi-crop combine & straw reapers", href: "/equipment?category=harvester" },
-  { name: "Water Pump", icon: Droplets, count: "310+ available", desc: "Solar, diesel & 5-10 HP electric pumps", href: "/equipment?category=water+pump" },
-  { name: "Rotavator", icon: Cog, count: "210+ available", desc: "5 to 8 feet heavy duty rotary tillers", href: "/equipment?category=rotavator" },
-  { name: "Seeder", icon: Sprout, count: "125+ available", desc: "Pneumatic seed & fertilizer drills", href: "/equipment?category=seeder" },
-  { name: "Sprayer", icon: SprayCan, count: "190+ available", desc: "Boom sprayers & tractor mounted", href: "/equipment?category=sprayer" },
-  { name: "Agri Drone", icon: Plane, count: "45+ available", desc: "DGCA certified pesticide spray drones", href: "/equipment?category=drone" },
-  { name: "Trailer", icon: Truck, count: "140+ available", desc: "Hydraulic tipping trolleys 3-5 ton", href: "/equipment?category=trailer" },
-];
 
 const featuredMachinery: EquipmentItem[] = [
   {
@@ -116,67 +104,60 @@ const featuredMachinery: EquipmentItem[] = [
   },
 ];
 
-const howItWorksSteps = [
-  {
-    step: "01",
-    title: "Find Nearby Machinery",
-    desc: "Search by tractor, harvester, or pump. Filter by distance, price, and operator preference in your village circle.",
-    icon: Search,
-    color: "from-emerald-700 to-emerald-900",
-  },
-  {
-    step: "02",
-    title: "Book Confirmed Dates",
-    desc: "Select hourly or daily requirements. Connect with verified RC-checked owners with transparent rates.",
-    icon: Calendar,
-    color: "from-amber-600 to-amber-800",
-  },
-  {
-    step: "03",
-    title: "Secure Digital Escrow",
-    desc: "Pay securely via UPI or Card. Your deposit is safely held until the machinery arrives and is verified.",
-    icon: CreditCard,
-    color: "from-emerald-800 to-stone-900",
-  },
-  {
-    step: "04",
-    title: "Farm With Confidence",
-    desc: "Equipment delivered directly to your farm gate, complete with optional skilled local operators.",
-    icon: Tractor,
-    color: "from-emerald-600 to-emerald-800",
-  },
-];
-
-const faqs = [
-  {
-    q: "How does KisanRent verify equipment and owners?",
-    a: "Every owner uploads registration certificates (RC), tractor insurance, and Aadhaar-based KYC. Our local field coordinators physically inspect machinery condition and verify serial numbers before activating any listing.",
-  },
-  {
-    q: "What if the tractor breaks down during my rental?",
-    a: "All KisanRent bookings are covered under our Breakdown Guarantee. If machinery suffers a mechanical fault, the owner will either provide a quick repair or a replacement unit, and you are not charged for any downtime.",
-  },
-  {
-    q: "Can I request a trained driver/operator?",
-    a: "Yes! Many listings include an experienced local tractor driver who knows local soil conditions and implement operations. You can toggle 'Operator Included' directly in search filters.",
-  },
-  {
-    q: "How does equipment delivery to my farm work?",
-    a: "Owners within 15–30 km can drive or tow the equipment right to your farmland coordinates for a standard flat delivery fee, or you may choose self-pickup from their depot.",
-  },
-  {
-    q: "How and when do equipment owners get paid?",
-    a: "Owners receive rental payouts straight into their linked bank accounts via UPI / NEFT within 24 hours of successful job completion and farmer handover confirmation.",
-  },
-];
-
 export default function HomePage() {
   const router = useRouter();
+  const { t } = useLanguage();
   const [eqType, setEqType] = useState("all");
   const [location, setLocation] = useState("Nashik, MH");
   const [dates, setDates] = useState("");
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+
+  const categories = [
+    { name: t("catTractor"), icon: Tractor, count: `480+ ${t("availableCount")}`, desc: t("catTractorDesc"), href: "/equipment?category=tractor" },
+    { name: t("catHarvester"), icon: Wheat, count: `160+ ${t("availableCount")}`, desc: t("catHarvesterDesc"), href: "/equipment?category=harvester" },
+    { name: t("catWaterPump"), icon: Droplets, count: `310+ ${t("availableCount")}`, desc: t("catWaterPumpDesc"), href: "/equipment?category=water+pump" },
+    { name: t("catRotavator"), icon: Cog, count: `210+ ${t("availableCount")}`, desc: t("catRotavatorDesc"), href: "/equipment?category=rotavator" },
+    { name: t("catSeeder"), icon: Sprout, count: `125+ ${t("availableCount")}`, desc: t("catSeederDesc"), href: "/equipment?category=seeder" },
+    { name: t("catSprayer"), icon: SprayCan, count: `190+ ${t("availableCount")}`, desc: t("catSprayerDesc"), href: "/equipment?category=sprayer" },
+    { name: t("catDrone"), icon: Plane, count: `45+ ${t("availableCount")}`, desc: t("catDroneDesc"), href: "/equipment?category=drone" },
+    { name: t("catTrailer"), icon: Truck, count: `140+ ${t("availableCount")}`, desc: t("catTrailerDesc"), href: "/equipment?category=trailer" },
+  ];
+
+  const howItWorksSteps = [
+    {
+      step: "01",
+      title: t("step1Title"),
+      desc: t("step1Desc"),
+      icon: Search,
+    },
+    {
+      step: "02",
+      title: t("step2Title"),
+      desc: t("step2Desc"),
+      icon: Calendar,
+    },
+    {
+      step: "03",
+      title: t("step3Title"),
+      desc: t("step3Desc"),
+      icon: CreditCard,
+    },
+    {
+      step: "04",
+      title: t("step4Title"),
+      desc: t("step4Desc"),
+      icon: Tractor,
+    },
+  ];
+
+  const faqs = [
+    { q: t("faq1Q"), a: t("faq1A") },
+    { q: t("faq2Q"), a: t("faq2A") },
+    { q: t("faq3Q"), a: t("faq3A") },
+    { q: t("faq4Q"), a: t("faq4A") },
+    { q: t("faq5Q"), a: t("faq5A") },
+  ];
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -228,21 +209,20 @@ export default function HomePage() {
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 backdrop-blur-md border border-white/20 text-white shadow-sm mb-6 animate-fade-up">
             <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-beacon" />
             <span className="text-xs sm:text-sm font-semibold tracking-wide">
-              Govt. e-NAM compliant · 10,000+ Verified Village Rentals
+              {t("govtBadge")}
             </span>
           </div>
 
           {/* Primary Headline */}
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white font-heading leading-tight max-w-4xl tracking-tight">
-            Rent the right equipment,{" "}
+            {t("heroTitle1")}
             <span className="bg-gradient-to-r from-amber-400 via-emerald-200 to-green-300 bg-clip-text text-transparent">
-              right next door.
+              {t("heroTitleHighlight")}
             </span>
           </h1>
 
           <p className="mt-4 text-base sm:text-xl text-stone-200 max-w-2xl font-normal leading-relaxed">
-            Directly rent verified tractors, harvesters, rotavators, and pumps from
-            nearby farm owners at honest hourly and daily rates.
+            {t("heroSubtitle")}
           </p>
 
           {/* ================= PROMINENT SEARCH BAR ================= */}
@@ -256,21 +236,20 @@ export default function HomePage() {
                 <div className="sm:col-span-4 flex flex-col text-left px-3 py-2 rounded-xl hover:bg-stone-100/70 dark:hover:bg-stone-800/60 transition-colors">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center gap-1.5">
                     <Tractor className="h-3.5 w-3.5 text-[#166534] dark:text-emerald-400" />
-                    Equipment Type
+                    {t("equipmentType")}
                   </label>
                   <select
                     value={eqType}
                     onChange={(e) => setEqType(e.target.value)}
                     className="mt-1 bg-transparent text-sm font-bold text-stone-900 dark:text-stone-100 focus:outline-none cursor-pointer"
                   >
-                    <option value="all">All Farm Machinery</option>
-                    <option value="tractor">Tractors (40-75 HP)</option>
-                    <option value="harvester">Combine Harvester</option>
-                    <option value="water pump">Water Pump (5-10 HP)</option>
-                    <option value="rotavator">Rotavator / Tiller</option>
-                    <option value="seeder">Multi-Crop Seeder</option>
-                    <option value="sprayer">Pesticide Sprayer</option>
-                    <option value="drone">Agricultural Drone</option>
+                    <option value="all">{t("allEquipment")}</option>
+                    <option value="tractor">{t("tractorsCategory")}</option>
+                    <option value="harvester">{t("harvestersCategory")}</option>
+                    <option value="water pump">{t("waterPumpsCategory")}</option>
+                    <option value="rotavator">{t("rotavatorsCategory")}</option>
+                    <option value="seeder">{t("seedersCategory")}</option>
+                    <option value="sprayer">{t("sprayersCategory")}</option>
                   </select>
                 </div>
 
@@ -282,7 +261,7 @@ export default function HomePage() {
                   <label className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center justify-between">
                     <span className="flex items-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5 text-[#166534] dark:text-emerald-400" />
-                      Village / District
+                      {t("locationLabel")}
                     </span>
                     <button
                       type="button"
@@ -291,7 +270,7 @@ export default function HomePage() {
                       className="text-[10px] font-bold text-[#166534] dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <Navigation className="h-3 w-3" />
-                      {isDetectingLocation ? "Detecting..." : "Use my location"}
+                      {isDetectingLocation ? "Detecting..." : t("detectGps")}
                     </button>
                   </label>
                   <input
@@ -310,7 +289,7 @@ export default function HomePage() {
                 <div className="sm:col-span-3 flex flex-col text-left px-3 py-2 rounded-xl hover:bg-stone-100/70 dark:hover:bg-stone-800/60 transition-colors">
                   <label className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5 text-[#166534] dark:text-emerald-400" />
-                    When Needed
+                    {t("whenNeed")}
                   </label>
                   <input
                     type="date"
@@ -329,7 +308,7 @@ export default function HomePage() {
                     className="w-full sm:w-auto h-12 sm:h-13 px-6 rounded-xl font-extrabold flex items-center justify-center gap-2 shadow-lg"
                   >
                     <Search className="h-5 w-5" />
-                    <span className="sm:hidden">Search Machinery</span>
+                    <span className="sm:hidden">{t("searchEquipmentBtn")}</span>
                   </Button>
                 </div>
               </div>
@@ -337,18 +316,18 @@ export default function HomePage() {
 
             {/* Quick Links below search */}
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mt-4 text-xs font-semibold text-stone-200">
-              <span className="text-stone-400">Popular nearby:</span>
+              <span className="text-stone-400">Popular:</span>
               <Link href="/equipment?category=tractor" className="hover:text-amber-300 transition-colors underline-offset-4 hover:underline">
-                🚜 Mahindra 475
+                🚜 {t("catTractor")}
               </Link>
               <Link href="/equipment?category=harvester" className="hover:text-amber-300 transition-colors underline-offset-4 hover:underline">
-                🌾 Paddy Harvester
+                🌾 {t("catHarvester")}
               </Link>
               <Link href="/equipment?category=water+pump" className="hover:text-amber-300 transition-colors underline-offset-4 hover:underline">
-                💧 5HP Solar Pump
+                💧 {t("catWaterPump")}
               </Link>
               <Link href="/equipment?category=rotavator" className="hover:text-amber-300 transition-colors underline-offset-4 hover:underline">
-                ⚙️ 7-ft Rotavator
+                ⚙️ {t("catRotavator")}
               </Link>
             </div>
           </div>
@@ -361,17 +340,17 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#166534] dark:text-emerald-400">
-                Explore Categories
+                {t("browseCategories")}
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-stone-100 font-heading mt-1">
-                Everything your farm needs for cultivation
+                {t("browseCategoriesSub")}
               </h2>
             </div>
             <Link
               href="/equipment"
               className="mt-3 md:mt-0 inline-flex items-center gap-1.5 text-sm font-bold text-[#166534] dark:text-emerald-400 hover:gap-2 transition-all"
             >
-              Browse all 1,200+ machines <ArrowRight className="h-4 w-4" />
+              {t("viewAllEquipment")} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
@@ -409,17 +388,17 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-[#166534] dark:text-emerald-400">
-                Verified & Available Now
+                {t("featuredTitle")}
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-stone-100 font-heading mt-1">
-                Top rated machinery in your district
+                {t("featuredSubtitle")}
               </h2>
             </div>
             <Link
               href="/equipment"
               className="mt-3 md:mt-0 inline-flex items-center gap-1.5 text-sm font-bold text-[#166534] dark:text-emerald-400 hover:underline"
             >
-              See all nearby equipment →
+              {t("viewAllEquipment")} →
             </Link>
           </div>
 
@@ -436,14 +415,13 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-2xl mx-auto mb-14">
             <span className="text-xs font-bold uppercase tracking-wider text-[#166534] dark:text-emerald-400">
-              Simple 4-Step Process
+              {t("howItWorksTitle")}
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold text-stone-900 dark:text-stone-100 font-heading mt-1">
-              How KisanRent works for farmers
+              {t("howItWorksSubtitle")}
             </h2>
             <p className="mt-2 text-stone-600 dark:text-stone-400 text-sm sm:text-base">
-              Renting modern agricultural machinery is as simple as ordering seeds.
-              Zero paperwork, no middlemen, full transparent rates.
+              {t("heroSubtitle")}
             </p>
           </div>
 
@@ -496,25 +474,23 @@ export default function HomePage() {
             <div className="lg:col-span-8 space-y-4">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 border border-amber-400/30">
                 <Percent className="h-3.5 w-3.5" />
-                Earn from your idle machinery
+                {t("calculateEarningsBtn")}
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-white leading-tight">
-                Own a tractor or harvester? <br />
-                <span className="text-amber-400">Earn up to ₹35,000 extra per month.</span>
+                {t("hostBannerTitle")}
               </h2>
               <p className="text-sm sm:text-base text-stone-300 max-w-xl leading-relaxed">
-                Keep your equipment earning during off-season and free days. We
-                provide verified renters, safe escrow payouts, and insurance backing.
+                {t("hostBannerSub")}
               </p>
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link href="/list-equipment">
                   <Button variant="accent" size="lg" className="rounded-xl font-black text-stone-950">
-                    + List Your Equipment (Takes 3 mins)
+                    + {t("hostBannerBtn")}
                   </Button>
                 </Link>
                 <Link href="/dashboard">
                   <Button variant="outline" size="lg" className="rounded-xl font-bold border-stone-600 text-white hover:bg-white/10">
-                    View Owner Earnings Calculator
+                    {t("calculateEarningsBtn")}
                   </Button>
                 </Link>
               </div>
@@ -523,120 +499,26 @@ export default function HomePage() {
             <div className="lg:col-span-4 rounded-2xl bg-white/10 p-6 backdrop-blur-md border border-white/20 space-y-4">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-emerald-400" />
-                Owner Security Promise
+                {t("trustVerified")}
               </h3>
               <ul className="space-y-3 text-xs text-stone-200">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Security deposits collected upfront from renters</span>
+                  <span>{t("trustVerifiedSub")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>You choose your rates (per hour, day, or acre)</span>
+                  <span>{t("trustPricing")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Send your own trusted driver or opt for self-drive</span>
+                  <span>{t("trustDelivery")}</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <span>Next-day UPI bank transfers directly to your phone</span>
+                  <span>{t("trustHelpline")}</span>
                 </li>
               </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================== FARMER TESTIMONIALS ===================== */}
-      <section className="py-16 sm:py-24 bg-[#FAFAF7] dark:bg-[#111311] border-b border-stone-200 dark:border-stone-800">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-xl mx-auto mb-12">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#166534] dark:text-emerald-400">
-              Community Voices
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-stone-100 font-heading mt-1">
-              Trusted by 10,000+ farmers across 500+ villages
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex gap-1 text-amber-400 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed italic">
-                  &ldquo;Saved me over ₹45,000 this Kharif season. Instead of taking
-                  a high-interest loan to buy a new rotavator, I rented one from
-                  Ramesh bhai just 4 km away. The machine ran perfectly.&rdquo;
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-950 flex items-center justify-center font-bold text-[#166534]">
-                  RK
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-stone-900 dark:text-stone-100">
-                    Rajesh Kadam
-                  </p>
-                  <p className="text-[11px] text-stone-500">Soybean Farmer · Nashik, MH</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex gap-1 text-amber-400 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed italic">
-                  &ldquo;I have 2 tractors that used to sit idle for weeks between
-                  sowing seasons. Now with KisanRent, I get steady bookings every
-                  weekend. The UPI payout comes right on time.&rdquo;
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-amber-100 dark:bg-amber-950 flex items-center justify-center font-bold text-amber-800">
-                  VP
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-stone-900 dark:text-stone-100">
-                    Vijay Patil
-                  </p>
-                  <p className="text-[11px] text-stone-500">Machinery Owner · Amravati, MH</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex gap-1 text-amber-400 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-4 w-4 fill-amber-400" />
-                  ))}
-                </div>
-                <p className="text-sm text-stone-700 dark:text-stone-300 leading-relaxed italic">
-                  &ldquo;We rented a 10HP water pump during the dry spell. Being able
-                  to pick hourly billing meant we only paid for exactly the 14 hours
-                  of field irrigation we needed. Truly transparent.&rdquo;
-                </p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-950 flex items-center justify-center font-bold text-blue-800">
-                  SD
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-stone-900 dark:text-stone-100">
-                    Sunita Deshmukh
-                  </p>
-                  <p className="text-[11px] text-stone-500">Cotton Farmer · Wardha, MH</p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -647,10 +529,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-xs font-bold uppercase tracking-wider text-[#166534] dark:text-emerald-400">
-              Clear Answers
+              {t("faqSubtitle")}
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900 dark:text-stone-100 font-heading mt-1">
-              Frequently Asked Questions
+              {t("faqTitle")}
             </h2>
           </div>
 
@@ -687,10 +569,10 @@ export default function HomePage() {
           <div className="mt-10 p-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
             <div>
               <p className="text-sm font-bold text-[#166534] dark:text-emerald-300">
-                Have more questions or need voice assistance?
+                {t("farmerSupport")}
               </p>
               <p className="text-xs text-stone-600 dark:text-stone-400 mt-0.5">
-                Speak directly with our local agricultural support desk in Hindi or Marathi.
+                {t("trustHelplineSub")}
               </p>
             </div>
             <a
@@ -698,7 +580,7 @@ export default function HomePage() {
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#166534] text-white text-xs font-bold hover:bg-[#14532D] transition-colors shrink-0"
             >
               <PhoneCall className="h-4 w-4" />
-              Call Toll-Free: 1800-120-FARM
+              {t("tollFreeSupport")} 1800-120-FARM
             </a>
           </div>
         </div>

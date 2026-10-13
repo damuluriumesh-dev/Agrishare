@@ -40,6 +40,9 @@ export const metadata: Metadata = {
   },
 };
 
+import { LanguageProvider } from "@/context/language-context";
+import { AuthProvider } from "@/context/auth-context";
+
 export default function RootLayout({
   children,
 }: {
@@ -51,10 +54,14 @@ export default function RootLayout({
       className={`${plusJakartaSans.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[#FAFAF7] text-stone-900 dark:bg-[#111311] dark:text-stone-100 pb-16 md:pb-0">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <BottomNav />
+        <AuthProvider>
+          <LanguageProvider>
+            <Navbar />
+            <main className="flex-1">{children}</main>
+            <Footer />
+            <BottomNav />
+          </LanguageProvider>
+        </AuthProvider>
       </body>
     </html>
   );

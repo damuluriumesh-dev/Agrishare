@@ -8,8 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tractor, Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { Tractor, Eye, EyeOff, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import { useAuth, ADMIN_EMAIL } from "@/context/auth-context";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -20,13 +20,14 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -34,16 +35,27 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginFormData) {
     setServerError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
-    if (error) {
-      setServerError(error.message);
-    } else {
-      router.push("/dashboard");
-      router.refresh();
+    try {
+      const res = await login(data.email, data.password);
+      if (res.success) {
+        if (data.email.trim().toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
+      } else {
+        setServerError(res.error || "Login failed. Please check credentials.");
+      }
+    } catch (err: any) {
+      setServerError(err?.message || "An unexpected error occurred.");
     }
+  }
+
+  async function handleQuickAdminLogin() {
+    setValue("email", ADMIN_EMAIL);
+    setValue("password", "admin123456");
+    await login(ADMIN_EMAIL, "admin123456");
+    router.push("/admin");
   }
 
   return (
@@ -198,6 +210,29 @@ export default function LoginPage() {
                 <ArrowRight className="h-4 w-4" />
               )}
               {isSubmitting ? "Signing in…" : "Sign in"}
+            </Button>
+
+            {/* Quick Admin Access Button */}
+            <div className="relative my-4 pt-2">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-gray-200 dark:border-gray-800" />
+              </div>
+              <div className="relative flex justify-center text-[10px] uppercase">
+                <span className="bg-gray-50 dark:bg-gray-950 px-2 text-gray-400 font-bold tracking-wider">
+                  Admin Sign In
+                </span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleQuickAdminLogin}
+              className="w-full border-amber-300 bg-amber-500/10 text-amber-800 dark:text-amber-300 dark:border-amber-700/60 font-bold text-xs hover:bg-amber-500/20 rounded-xl h-11"
+              id="quick-admin-login-btn"
+            >
+              <ShieldCheck className="h-4 w-4 mr-2 text-amber-600" />
+              Sign in as Admin ({ADMIN_EMAIL})
             </Button>
           </form>
 

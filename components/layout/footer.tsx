@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   Tractor,
@@ -10,8 +12,11 @@ import {
   Heart,
   Globe,
 } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
 
 export function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-stone-900 text-stone-300 border-t border-stone-800">
       {/* Trust Badges Strip */}
@@ -23,8 +28,8 @@ export function Footer() {
                 <ShieldCheck className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">100% Verified Owners</p>
-                <p className="text-[11px] text-stone-400">RC & KYC validated</p>
+                <p className="text-xs font-bold text-white">{t("trustVerified")}</p>
+                <p className="text-[11px] text-stone-400">{t("trustVerifiedSub")}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -32,8 +37,8 @@ export function Footer() {
                 <CheckCircle2 className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">Fair Transparent Pricing</p>
-                <p className="text-[11px] text-stone-400">No hidden fees per day/hr</p>
+                <p className="text-xs font-bold text-white">{t("trustPricing")}</p>
+                <p className="text-[11px] text-stone-400">{t("trustPricingSub")}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -41,8 +46,8 @@ export function Footer() {
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">On-Time Farm Delivery</p>
-                <p className="text-[11px] text-stone-400">Trained local operators</p>
+                <p className="text-xs font-bold text-white">{t("trustDelivery")}</p>
+                <p className="text-[11px] text-stone-400">{t("trustDeliverySub")}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -50,8 +55,8 @@ export function Footer() {
                 <Phone className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">24/7 Farmer Helpline</p>
-                <p className="text-[11px] text-stone-400">1800-120-FARM (Free)</p>
+                <p className="text-xs font-bold text-white">{t("trustHelpline")}</p>
+                <p className="text-[11px] text-stone-400">{t("trustHelplineSub")}</p>
               </div>
             </div>
           </div>
@@ -72,9 +77,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-sm text-stone-400 leading-relaxed max-w-sm">
-              Empowering India&apos;s agrarian heartbeat. We connect farmers with
-              nearby equipment owners to make modern farming tools affordable,
-              accessible, and dependable.
+              {t("footerDesc")}
             </p>
             <div className="pt-2 space-y-2 text-xs text-stone-400">
               <div className="flex items-center gap-2">
@@ -91,32 +94,32 @@ export function Footer() {
           {/* Column 1: Rent Equipment */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Machinery
+              {t("equipmentCategories")}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/equipment" className="hover:text-emerald-400 transition-colors">
-                  Tractor Rentals
+                  {t("catTractor")} Rentals
                 </Link>
               </li>
               <li>
                 <Link href="/equipment" className="hover:text-emerald-400 transition-colors">
-                  Harvesters & Threshers
+                  {t("catHarvester")} & Reapers
                 </Link>
               </li>
               <li>
                 <Link href="/equipment" className="hover:text-emerald-400 transition-colors">
-                  Solar & Diesel Pumps
+                  {t("catWaterPump")} Rentals
                 </Link>
               </li>
               <li>
                 <Link href="/equipment" className="hover:text-emerald-400 transition-colors">
-                  Rotavators & Tillers
+                  {t("catRotavator")} & Tillers
                 </Link>
               </li>
               <li>
                 <Link href="/equipment" className="hover:text-emerald-400 transition-colors">
-                  Agri-Drones & Sprayers
+                  {t("catDrone")} & {t("catSprayer")}
                 </Link>
               </li>
             </ul>
@@ -125,27 +128,27 @@ export function Footer() {
           {/* Column 2: Owners */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              For Machinery Owners
+              {t("listEquipment")}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/list-equipment" className="hover:text-emerald-400 transition-colors font-semibold text-amber-400">
-                  + List Your Equipment
+                  + {t("hostBannerBtn")}
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">
-                  Owner Dashboard
+                  {t("dashboard")}
                 </Link>
               </li>
               <li>
                 <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">
-                  Earnings & Payouts
+                  {t("calculateEarningsBtn")}
                 </Link>
               </li>
               <li>
                 <Link href="/#how-it-works" className="hover:text-emerald-400 transition-colors">
-                  Equipment Insurance Policy
+                  {t("howItWorks")}
                 </Link>
               </li>
             </ul>
@@ -154,25 +157,22 @@ export function Footer() {
           {/* Column 3: Trust & Legal */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-white mb-4">
-              Trust & Support
+              {t("farmerSupport")}
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/styleguide" className="hover:text-emerald-400 transition-colors">
-                  Design System & Tokens
+                  {t("designSystem")}
                 </Link>
               </li>
               <li>
-                <span className="text-stone-400">Help Center (1800-120-FARM)</span>
+                <span className="text-stone-400">1800-120-FARM (Helpline)</span>
               </li>
               <li>
-                <span className="text-stone-400">Security & Deposit Safety</span>
+                <span className="text-stone-400">Security & Escrow</span>
               </li>
               <li>
-                <span className="text-stone-400">Terms of Service</span>
-              </li>
-              <li>
-                <span className="text-stone-400">Privacy Policy</span>
+                <span className="text-stone-400">Terms & Policy</span>
               </li>
             </ul>
           </div>
@@ -180,7 +180,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-12 pt-6 border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-stone-500">
-          <p>© 2024 KisanRent Platform. Built for Indian Farmers.</p>
+          <p>{t("copyright")}</p>
           <div className="flex items-center gap-1 text-stone-400">
             <span>Crafted with</span>
             <Heart className="h-3.5 w-3.5 fill-red-500 text-red-500" />

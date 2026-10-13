@@ -7,6 +7,7 @@ import { Heart, MapPin, ShieldCheck, Wrench, Sparkles, Navigation } from "lucide
 import { RatingStars } from "@/components/ui/rating-stars";
 import { PriceTag } from "@/components/ui/price-tag";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/context/language-context";
 
 export interface EquipmentItem {
   id: string;
@@ -54,6 +55,7 @@ interface EquipmentCardProps {
 
 export function EquipmentCard({ equipment, className }: EquipmentCardProps) {
   const [isSaved, setIsSaved] = useState(false);
+  const { t } = useLanguage();
 
   const imageSrc =
     equipment.imageUrl ||
@@ -89,7 +91,7 @@ export function EquipmentCard({ equipment, className }: EquipmentCardProps) {
             {equipment.isVerified && (
               <span className="inline-flex items-center gap-1 rounded-full bg-[#166534]/90 px-2.5 py-0.5 text-[11px] font-semibold text-white backdrop-blur-md shadow-sm">
                 <ShieldCheck className="h-3 w-3 text-emerald-300" />
-                Verified
+                {t("verifiedOwner")}
               </span>
             )}
           </div>
@@ -121,7 +123,7 @@ export function EquipmentCard({ equipment, className }: EquipmentCardProps) {
           {equipment.distanceKm !== undefined && (
             <span className="inline-flex items-center gap-1 rounded-md bg-emerald-950/70 px-2 py-0.5 backdrop-blur-md text-emerald-200">
               <Navigation className="h-3 w-3 text-emerald-400" />
-              {equipment.distanceKm} km away
+              {equipment.distanceKm} {t("kmAway")}
             </span>
           )}
         </div>
@@ -150,7 +152,7 @@ export function EquipmentCard({ equipment, className }: EquipmentCardProps) {
           />
           <span className="inline-flex items-center gap-1 text-[11px] font-medium text-stone-600 dark:text-stone-400">
             <Wrench className="h-3 w-3 text-amber-500" />
-            {equipment.operatorIncluded ? "Operator incl." : "Self-drive"}
+            {equipment.operatorIncluded ? t("operatorIncluded") : t("selfDriven")}
           </span>
         </div>
 
@@ -160,14 +162,14 @@ export function EquipmentCard({ equipment, className }: EquipmentCardProps) {
             <PriceTag amount={equipment.pricePerDay} period="day" size="md" />
             {equipment.pricePerHour && (
               <span className="text-[11px] text-stone-500 block">
-                ₹{equipment.pricePerHour}/hr available
+                ₹{equipment.pricePerHour}{t("perHour")}
               </span>
             )}
           </div>
 
           <Link href={`/equipment/${equipment.id}`}>
             <Button size="sm" variant="default" className="rounded-xl font-bold">
-              Book Now
+              {t("bookNow")}
             </Button>
           </Link>
         </div>

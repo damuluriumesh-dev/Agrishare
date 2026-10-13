@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,27 +15,53 @@ import {
   Phone,
   HelpCircle,
   Palette,
+  Check,
+  ShieldCheck,
+  LogOut,
+  User,
 } from "lucide-react";
+import { useLanguage } from "@/context/language-context";
+import { useAuth } from "@/context/auth-context";
+import { Language } from "@/lib/translations";
 
-const languages = [
-  { code: "en", name: "English" },
-  { code: "hi", name: "हिन्दी" },
-  { code: "te", name: "తెలుగు" },
+const languages: { code: Language; name: string; label: string }[] = [
+  { code: "en", name: "English", label: "English" },
+  { code: "hi", name: "Hindi", label: "हिन्दी" },
+  { code: "te", name: "Telugu", label: "తెలుగు" },
 ];
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [currentLang, setCurrentLang] = useState("en");
   const [langMenuOpen, setLangMenuOpen] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
 
+  const { language, setLanguage, t } = useLanguage();
+  const { user, isAdmin, logout } = useAuth();
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        langMenuRef.current &&
+        !langMenuRef.current.contains(event.target as Node)
+      ) {
+        setLangMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const navLinks = [
-    { label: "Browse Equipment", href: "/equipment" },
-    { label: "How It Works", href: "/#how-it-works" },
-    { label: "List Equipment", href: "/list-equipment" },
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "Design System", href: "/styleguide", icon: Palette },
+    { label: t("browseEquipment"), href: "/equipment" },
+    { label: t("howItWorks"), href: "/#how-it-works" },
+    { label: t("listEquipment"), href: "/list-equipment" },
+    { label: t("dashboard"), href: "/dashboard" },
+    { label: t("designSystem"), href: "/styleguide", icon: Palette },
   ];
+
+  const currentLangObj = languages.find((l) => l.code === language) || languages[0];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 transition-all">
@@ -52,7 +78,7 @@ export function Navbar() {
                 <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
               </span>
               <span className="text-[10px] text-stone-500 font-medium tracking-wide">
-                FARM MACHINERY SHARING
+                {t("farmMachinerySharing")}
               </span>
             </div>
           </Link>
@@ -78,37 +104,59 @@ export function Navbar() {
           </nav>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2 sm:gap-2.5">
+            {/* ADMIN DASHBOARD ICON & BUTTON (Shown when logged in with chowdaryu24@gmail.com) */}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                id="admin-dashboard-link"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-black text-xs shadow-md shadow-amber-500/20 hover:from-amber-400 hover:to-amber-500 hover:scale-105 transition-all border border-amber-400 cursor-pointer"
+                title="Enter Admin Dashboard"
+              >
+                <ShieldCheck className="h-4 w-4 fill-stone-950 text-amber-300 shrink-0" />
+                <span className="hidden sm:inline">{t("adminDashboard")}</span>
+                <span className="bg-stone-950 text-amber-400 text-[9px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider">
+                  ADMIN
+                </span>
+              </Link>
+            )}
+
             {/* Language Switcher */}
-            <div className="relative">
+            <div className="relative" ref={langMenuRef}>
               <button
                 type="button"
+                id="language-switcher-btn"
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 text-xs font-bold text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-200 text-xs font-bold text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:text-stone-300 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                 aria-label="Change Language"
+                aria-expanded={langMenuOpen}
               >
                 <Globe className="h-3.5 w-3.5 text-[#166534] dark:text-emerald-400" />
-                <span>
-                  {languages.find((l) => l.code === currentLang)?.name || "English"}
-                </span>
+                <span className="font-semibold">{currentLangObj.label}</span>
               </button>
 
               {langMenuOpen && (
-                <div className="absolute right-0 mt-2 w-32 rounded-xl bg-white p-1.5 shadow-lg border border-stone-200 dark:bg-stone-900 dark:border-stone-800 z-50 animate-in fade-in">
+                <div className="absolute right-0 mt-2 w-36 rounded-xl bg-white p-1.5 shadow-xl border border-stone-200 dark:bg-stone-900 dark:border-stone-800 z-50 animate-in fade-in zoom-in-95">
+                  <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                    Language
+                  </div>
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => {
-                        setCurrentLang(lang.code);
+                        setLanguage(lang.code);
                         setLangMenuOpen(false);
                       }}
-                      className={`w-full text-left px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
-                        currentLang === lang.code
-                          ? "bg-emerald-50 text-[#166534] dark:bg-emerald-950/80 dark:text-emerald-300"
+                      className={`w-full flex items-center justify-between text-left px-3 py-2 text-xs font-semibold rounded-lg transition-colors cursor-pointer ${
+                        language === lang.code
+                          ? "bg-emerald-50 text-[#166534] dark:bg-emerald-950/80 dark:text-emerald-300 font-bold"
                           : "text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
                       }`}
                     >
-                      {lang.name}
+                      <span>{lang.label}</span>
+                      {language === lang.code && (
+                        <Check className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                      )}
                     </button>
                   ))}
                 </div>
@@ -128,19 +176,37 @@ export function Navbar() {
               </span>
             </Link>
 
-            {/* Desktop Auth Buttons */}
-            <div className="hidden sm:flex items-center gap-2">
-              <Link href="/login">
-                <Button variant="ghost" size="sm" className="font-semibold text-xs">
-                  Log in
+            {/* Desktop Auth Section */}
+            {user ? (
+              <div className="hidden sm:flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-stone-100 dark:bg-stone-800 text-xs font-semibold text-stone-700 dark:text-stone-300">
+                  <User className="h-3.5 w-3.5 text-emerald-600" />
+                  <span className="max-w-[120px] truncate">{user.name || user.email.split("@")[0]}</span>
+                </div>
+                <Button
+                  onClick={() => logout()}
+                  variant="ghost"
+                  size="sm"
+                  className="font-semibold text-xs text-stone-600 hover:text-red-600"
+                  title="Sign out"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
                 </Button>
-              </Link>
-              <Link href="/signup">
-                <Button size="sm" variant="default" className="font-bold text-xs">
-                  Sign up
-                </Button>
-              </Link>
-            </div>
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-2">
+                <Link href="/login">
+                  <Button variant="ghost" size="sm" className="font-semibold text-xs">
+                    {t("login")}
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button size="sm" variant="default" className="font-bold text-xs">
+                    {t("signup")}
+                  </Button>
+                </Link>
+              </div>
+            )}
 
             {/* Mobile menu button */}
             <button
@@ -156,6 +222,46 @@ export function Navbar() {
         {/* Mobile Slide-down Menu */}
         {mobileOpen && (
           <div className="lg:hidden mt-2 rounded-2xl bg-white/98 p-5 shadow-xl backdrop-blur-xl border border-stone-200/80 dark:bg-stone-900/98 dark:border-stone-800">
+            {/* Mobile Admin Banner (Shown when chowdaryu24@gmail.com is logged in) */}
+            {isAdmin && (
+              <Link
+                href="/admin"
+                onClick={() => setMobileOpen(false)}
+                className="mb-3 flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 text-stone-950 font-black text-sm shadow-md"
+              >
+                <span className="flex items-center gap-2">
+                  <ShieldCheck className="h-5 w-5 fill-stone-950 text-amber-300" />
+                  {t("adminDashboard")}
+                </span>
+                <span className="text-[10px] font-black uppercase bg-stone-950 text-amber-400 px-2 py-0.5 rounded-md tracking-wider">
+                  ADMIN CONSOLE
+                </span>
+              </Link>
+            )}
+
+            {/* Mobile Language Switcher Row */}
+            <div className="mb-4 pb-3 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs font-bold text-stone-600 dark:text-stone-300">
+                <Globe className="h-4 w-4 text-[#166534] dark:text-emerald-400" />
+                <span>Select Language:</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {languages.map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => setLanguage(lang.code)}
+                    className={`px-2.5 py-1 text-xs rounded-lg font-bold transition-colors ${
+                      language === lang.code
+                        ? "bg-[#166534] text-white"
+                        : "bg-stone-100 text-stone-700 hover:bg-stone-200 dark:bg-stone-800 dark:text-stone-300"
+                    }`}
+                  >
+                    {lang.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <nav className="flex flex-col gap-1.5">
               {navLinks.map((link) => (
                 <Link
@@ -172,24 +278,44 @@ export function Navbar() {
             <div className="mt-4 pt-4 border-t border-stone-200 dark:border-stone-800 flex flex-col gap-2.5">
               <div className="flex items-center justify-between px-2 text-xs text-stone-500 font-medium">
                 <span className="flex items-center gap-1.5">
-                  <Phone className="h-3.5 w-3.5 text-[#166534]" /> Toll Free Support:
+                  <Phone className="h-3.5 w-3.5 text-[#166534]" /> {t("tollFreeSupport")}
                 </span>
                 <span className="font-bold text-stone-800 dark:text-stone-200">
                   1800-120-FARM
                 </span>
               </div>
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                <Link href="/login" onClick={() => setMobileOpen(false)}>
-                  <Button variant="outline" className="w-full text-xs font-bold">
-                    Log in
+
+              {user ? (
+                <div className="flex items-center justify-between p-3 rounded-xl bg-stone-100 dark:bg-stone-800 mt-2">
+                  <span className="text-xs font-bold text-stone-800 dark:text-stone-200 truncate">
+                    {user.email}
+                  </span>
+                  <Button
+                    onClick={() => {
+                      logout();
+                      setMobileOpen(false);
+                    }}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs font-bold text-red-600"
+                  >
+                    Sign out
                   </Button>
-                </Link>
-                <Link href="/signup" onClick={() => setMobileOpen(false)}>
-                  <Button variant="default" className="w-full text-xs font-bold">
-                    Sign up
-                  </Button>
-                </Link>
-              </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  <Link href="/login" onClick={() => setMobileOpen(false)}>
+                    <Button variant="outline" className="w-full text-xs font-bold">
+                      {t("login")}
+                    </Button>
+                  </Link>
+                  <Link href="/signup" onClick={() => setMobileOpen(false)}>
+                    <Button variant="default" className="w-full text-xs font-bold">
+                      {t("signup")}
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}

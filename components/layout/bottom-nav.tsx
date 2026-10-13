@@ -3,23 +3,19 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Search, Calendar, MessageSquare, User } from "lucide-react";
-
-interface NavItem {
-  label: string;
-  href: string;
-  icon: typeof Home;
-}
-
-const navItems: NavItem[] = [
-  { label: "Home", href: "/", icon: Home },
-  { label: "Search", href: "/equipment", icon: Search },
-  { label: "Bookings", href: "/dashboard", icon: Calendar },
-  { label: "List", href: "/list-equipment", icon: MessageSquare },
-  { label: "Account", href: "/login", icon: User },
-];
+import { useLanguage } from "@/context/language-context";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { t } = useLanguage();
+
+  const navItems = [
+    { label: t("home"), href: "/", icon: Home },
+    { label: t("search"), href: "/equipment", icon: Search },
+    { label: t("bookings"), href: "/dashboard", icon: Calendar },
+    { label: t("list"), href: "/list-equipment", icon: MessageSquare },
+    { label: t("account"), href: "/login", icon: User },
+  ];
 
   return (
     <nav
